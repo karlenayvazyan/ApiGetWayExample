@@ -14,48 +14,22 @@ services:
       server.port: 8085
 
   eureka-client-1:
-    build: 
+    build:
       context: .
       dockerfile: EurekaFirstClient/Dockerfile
-    container_name: first-client-1
+    deploy:
+      mode: replicated
+      replicas: 3
+      placement:
+        constraints: [ node.role == worker ]
     ports:
-      - "8001:8001"
+      - "8001-8100:8001"
     depends_on:
       - eureka-server
     networks:
       - ms-network
     environment:
       - "server.port=8001"
-      - "EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8085/eureka"
-
-  eureka-client-2:
-    build: 
-      context: .
-      dockerfile: EurekaFirstClient/Dockerfile
-    container_name: first-client-2
-    ports:
-      - "8002:8002"
-    depends_on:
-      - eureka-server
-    networks:
-      - ms-network
-    environment:
-      - "server.port=8002"
-      - "EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8085/eureka"
-
-  eureka-client-3:
-    build: 
-      context: .
-      dockerfile: EurekaFirstClient/Dockerfile
-    container_name: first-client-3
-    ports:
-      - "8003:8003"
-    depends_on:
-      - eureka-server
-    networks:
-      - ms-network
-    environment:
-      - "server.port=8003"
       - "EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8085/eureka"
   
   gateway-example:
@@ -68,8 +42,6 @@ services:
     depends_on:
       - eureka-server
       - eureka-client-1
-      - eureka-client-2
-      - eureka-client-3
     networks:
       - ms-network
     environment:
